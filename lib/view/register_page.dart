@@ -9,7 +9,7 @@ import '../utils/const.dart';
 class RegisterPage extends StatefulWidget {
   final void Function()? onTap;
 
-  RegisterPage({super.key, required this.onTap});
+  const RegisterPage({super.key, required this.onTap});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -17,25 +17,25 @@ class RegisterPage extends StatefulWidget {
 
 
 class _RegisterPageState extends State<RegisterPage> {
-  final emailcontroller = TextEditingController();
-  final namecontroller = TextEditingController();
+  final emailController = TextEditingController();
+  final nameController = TextEditingController();
 
-   final passwordcontroller= TextEditingController();
+   final passwordController= TextEditingController();
 
-   final confirmpasswordcontroller= TextEditingController();
+   final confirmPasswordController= TextEditingController();
    String userImage='https://www.goodmorningimagesdownload.com/wp-content/uploads/2021/12/Best-Quality-Profile-Images-Pic-Download-2023.jpg';
 
 
 
 
    void signUp()async{
-     if(passwordcontroller.text!=confirmpasswordcontroller.text){
-       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Passwords do not Match !!')));
+     if(passwordController.text!=confirmPasswordController.text){
+       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Passwords do not Match !!')));
        return ;
      }
 final authService = Provider.of<AuthService>(context,listen: false);
      try{
-       await authService.signUpWithEmailandPassword(email: emailcontroller.text, password: passwordcontroller.text, username: namecontroller.text, userImage: userImage);
+       await authService.signUpWithEmailandPassword(email: emailController.text, password: passwordController.text, username: nameController.text, userImage: userImage);
 
 
      }catch(e){
@@ -62,13 +62,13 @@ final authService = Provider.of<AuthService>(context,listen: false);
                   k40height,
                   _buildAvatarWithAddButton(userImage),
                   k40height,
-                  TextfieldWidget(controller: emailcontroller,obscureText: false, hintText: 'Email',),
+                  TextfieldWidget(controller: emailController,obscureText: false, hintText: 'Email',),
                   k10height,
-                  TextfieldWidget(controller: namecontroller,obscureText: false, hintText: 'User Name',),
+                  TextfieldWidget(controller: nameController,obscureText: false, hintText: 'User Name',),
                   k10height,
-                  TextfieldWidget(controller: passwordcontroller,obscureText: true, hintText: 'Password',),
+                  TextfieldWidget(controller: passwordController,obscureText: true, hintText: 'Password',),
                   k10height,
-                  TextfieldWidget(controller: confirmpasswordcontroller,obscureText: true, hintText: 'Confirm Password',),
+                  TextfieldWidget(controller: confirmPasswordController,obscureText: true, hintText: 'Confirm Password',),
 
                   k30height,
                   MyButton(text: 'Sign Up', onTap: (){
@@ -78,11 +78,11 @@ final authService = Provider.of<AuthService>(context,listen: false);
                     Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Already have an account?'),
+                      const Text('Already have an account?'),
                       k5width,
                       GestureDetector(
                           onTap:widget.onTap,
-                          child: Text('Login Now!!', style: TextStyle(fontWeight: FontWeight.bold),)),
+                          child:const Text('Login Now!!', style: TextStyle(fontWeight: FontWeight.bold),)),
 
                     ],)
 
