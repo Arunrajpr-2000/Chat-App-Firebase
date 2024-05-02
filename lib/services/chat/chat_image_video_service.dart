@@ -32,5 +32,3 @@ Future<File?> pickVideo() async {
 
   return video;
 }
-
-

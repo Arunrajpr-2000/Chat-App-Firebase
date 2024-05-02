@@ -15,81 +15,102 @@ class RegisterPage extends StatefulWidget {
   State<RegisterPage> createState() => _RegisterPageState();
 }
 
-
 class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
   final nameController = TextEditingController();
 
-   final passwordController= TextEditingController();
+  final passwordController = TextEditingController();
 
-   final confirmPasswordController= TextEditingController();
-   String userImage='https://www.goodmorningimagesdownload.com/wp-content/uploads/2021/12/Best-Quality-Profile-Images-Pic-Download-2023.jpg';
+  final confirmPasswordController = TextEditingController();
+  String userImage =
+      'https://www.goodmorningimagesdownload.com/wp-content/uploads/2021/12/Best-Quality-Profile-Images-Pic-Download-2023.jpg';
 
-
-
-
-   void signUp()async{
-     if(passwordController.text!=confirmPasswordController.text){
-       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Passwords do not Match !!')));
-       return ;
-     }
-final authService = Provider.of<AuthService>(context,listen: false);
-     try{
-       await authService.signUpWithEmailandPassword(email: emailController.text, password: passwordController.text, username: nameController.text, userImage: userImage);
-
-
-     }catch(e){
-       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-
-     }
-   }
-
-
+  void signUp() async {
+    if (passwordController.text != confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Passwords do not Match!!')));
+      return;
+    }
+    final authService = Provider.of<AuthService>(context, listen: false);
+    try {
+      await authService.signUpWithEmailAndPassword(
+          email: emailController.text,
+          password: passwordController.text,
+          username: nameController.text,
+          userImage: userImage);
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return   Scaffold(
-      body:Center(
+    return Scaffold(
+      body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: SingleChildScrollView(
-            child: Column(
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              // const  Icon(Icons.message,size: 100,color: Colors.black,),
+              // k20height,
+              const Text(
+                'Lets create an account for you!!',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              ),
+              k40height,
+              _buildAvatarWithAddButton(userImage),
+              k40height,
+              TextfieldWidget(
+                controller: emailController,
+                obscureText: false,
+                hintText: 'Email',
+              ),
+              k10height,
+              TextfieldWidget(
+                controller: nameController,
+                obscureText: false,
+                hintText: 'User Name',
+              ),
+              k10height,
+              TextfieldWidget(
+                controller: passwordController,
+                obscureText: true,
+                hintText: 'Password',
+              ),
+              k10height,
+              TextfieldWidget(
+                controller: confirmPasswordController,
+                obscureText: true,
+                hintText: 'Confirm Password',
+              ),
+
+              k30height,
+              MyButton(
+                  text: 'Sign Up',
+                  onTap: () {
+                    signUp();
+                  }),
+              k40height,
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // const  Icon(Icons.message,size: 100,color: Colors.black,),
-                  // k20height,
-                  const  Text('Lets create an account for you!!', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
-                  k40height,
-                  _buildAvatarWithAddButton(userImage),
-                  k40height,
-                  TextfieldWidget(controller: emailController,obscureText: false, hintText: 'Email',),
-                  k10height,
-                  TextfieldWidget(controller: nameController,obscureText: false, hintText: 'User Name',),
-                  k10height,
-                  TextfieldWidget(controller: passwordController,obscureText: true, hintText: 'Password',),
-                  k10height,
-                  TextfieldWidget(controller: confirmPasswordController,obscureText: true, hintText: 'Confirm Password',),
-
-                  k30height,
-                  MyButton(text: 'Sign Up', onTap: (){
-                  signUp();
-                  }),
-                  k40height,
-                    Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('Already have an account?'),
-                      k5width,
-                      GestureDetector(
-                          onTap:widget.onTap,
-                          child:const Text('Login Now!!', style: TextStyle(fontWeight: FontWeight.bold),)),
-
-                    ],)
-
-                ]),
+                  const Text('Already have an account?'),
+                  k5width,
+                  GestureDetector(
+                      onTap: widget.onTap,
+                      child: const Text(
+                        'Login Now!!',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      )),
+                ],
+              )
+            ]),
           ),
         ),
-      ),);
+      ),
+    );
   }
 
   Widget _buildAvatarWithAddButton(String image) {
@@ -109,7 +130,6 @@ final authService = Provider.of<AuthService>(context,listen: false);
             onTap: () {
               setState(() async {
                 final imageUrl = await ImageService.getimage();
-                //image.add(imageurl.toString());
                 setState(() {});
                 userImage = imageUrl!;
 

@@ -1,7 +1,5 @@
 import 'dart:io';
-
 import 'package:chat_app_firebase/components/chat_bubble.dart';
-import 'package:chat_app_firebase/components/text_field.dart';
 import 'package:chat_app_firebase/model/user_model.dart';
 import 'package:chat_app_firebase/services/chat/audio_service.dart';
 import 'package:chat_app_firebase/utils/const.dart';
@@ -17,12 +15,10 @@ import 'package:path_provider/path_provider.dart';
 import '../services/chat/chat_image_video_service.dart';
 
 class ChatPage extends StatefulWidget {
-  // final String receiveruserEmail;
-  // final String receiveruserID;
-  // final bool isOnline;
   UserModel userModel;
+  String username;
 
-  ChatPage({super.key, required this.userModel});
+  ChatPage({super.key, required this.userModel, required this.username});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -37,20 +33,20 @@ class _ChatPageState extends State<ChatPage> {
   void sentMessages() async {
     if (_messageController.text.isNotEmpty) {
       await _chatService.sendMessage(widget.userModel.userUid,
-          _messageController.text, 'text', widget.userModel.userEmail);
+          _messageController.text, 'text', widget.userModel.userEmail,widget.userModel.token,                      widget.username
+      );
 
       _messageController.clear();
     }
   }
 
+
+
+
+
+
   bool isRecording = false;
   String filepath = '';
-
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +64,6 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-
   Widget _buildMessageList() {
     return StreamBuilder(
       stream: _chatService.getMessages(
@@ -84,28 +79,25 @@ class _ChatPageState extends State<ChatPage> {
         }
 
         List<DocumentSnapshot> reversedMessages =
-        List.from(snapshot.data!.docs.reversed);
+            List.from(snapshot.data!.docs.reversed);
 
         return reversedMessages.isEmpty
             ? const Center(
-          child: Text(
-            'Say Hello..!!',
-            style: TextStyle(color: Colors.red),
-          ),
-        )
+                child: Text(
+                  'Say Hello..!!',
+                  style: TextStyle(color: Colors.red),
+                ),
+              )
             : ListView.builder(
-          reverse: true,
-          itemCount: reversedMessages.length,
-          itemBuilder: (BuildContext context, int index) {
-            return _buildMessageItem(reversedMessages[index]);
-          },
-        );
+                reverse: true,
+                itemCount: reversedMessages.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return _buildMessageItem(reversedMessages[index]);
+                },
+              );
       },
     );
   }
-
-
-
 
   ///
   Widget _buildMessageItem(DocumentSnapshot document) {
@@ -200,6 +192,9 @@ class _ChatPageState extends State<ChatPage> {
                 file: image!,
                 messageType: 'image',
                 receiverEmail: widget.userModel.userEmail,
+                token: widget.userModel.token,
+                  user:
+                  widget.username
               );
             },
           ),
@@ -217,7 +212,11 @@ class _ChatPageState extends State<ChatPage> {
                   receiverUserId: widget.userModel.userUid,
                   file: video!,
                   messageType: 'video',
-                  receiverEmail: widget.userModel.userEmail);
+                  receiverEmail: widget.userModel.userEmail,
+                  token: widget.userModel.token,
+                  user:
+                  widget.username
+              );
             },
           ),
 
@@ -252,7 +251,11 @@ class _ChatPageState extends State<ChatPage> {
                       receiverUserId: widget.userModel.userUid,
                       file: audioFile!,
                       messageType: 'audio',
-                      receiverEmail: widget.userModel.userEmail);
+                      receiverEmail: widget.userModel.userEmail,
+                      token: widget.userModel.token,
+                      user:
+                      widget.username
+                  );
 
                   AudioService.record.dispose();
 
@@ -262,12 +265,12 @@ class _ChatPageState extends State<ChatPage> {
                   });
                 },
                 child: isRecording == true
-                    ? Icon(
+                    ?const Icon(
                         Icons.mic,
                         color: AppColors.blueColor,
                         size: 40,
                       )
-                    : Icon(
+                    :const Icon(
                         Icons.mic_rounded,
                         color: AppColors.messengerDarkGrey,
                         size: 30,
@@ -300,8 +303,9 @@ class _ChatPageState extends State<ChatPage> {
               Icons.send,
               color: AppColors.messengerBlue,
             ),
-            onPressed: () {
+            onPressed: ()async {
               sentMessages();
+
             },
           ),
         ],

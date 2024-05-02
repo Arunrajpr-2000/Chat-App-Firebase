@@ -16,15 +16,15 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final emailcontroller = TextEditingController();
-  final passwordcontroller = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
   ///sign in user
   void signIn() async {
     final authservice = Provider.of<AuthService>(context, listen: false);
     try {
-      await authservice.signInWithEmailandpassword(
-          emailcontroller.text, passwordcontroller.text);
+      await authservice.signInWithEmailAndPassword(
+          emailController.text, passwordController.text);
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.toString())));
@@ -47,13 +47,13 @@ class _LoginPageState extends State<LoginPage> {
             const Text('Welcome Back!!'),
             k30height,
             TextfieldWidget(
-              controller: emailcontroller,
+              controller: emailController,
               obscureText: false,
               hintText: 'Email',
             ),
             k10height,
             TextfieldWidget(
-              controller: passwordcontroller,
+              controller: passwordController,
               obscureText: true,
               hintText: 'Password',
             ),
@@ -67,11 +67,11 @@ class _LoginPageState extends State<LoginPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Not a member?'),
+              const  Text('Not a member?'),
                 k5width,
                 GestureDetector(
                     onTap: widget.onTap,
-                    child: Text(
+                    child:const Text(
                       'Register Now!!',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     )),

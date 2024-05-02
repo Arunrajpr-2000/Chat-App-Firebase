@@ -3,16 +3,18 @@ class UserModel {
   final String userEmail;
   final String userUid;
   final String userImg;
-  final String userPassword;
+  final String? userPassword;
   final bool isOnline;
+  final String token;
 
   UserModel({
     required this.userEmail,
     required this.username,
     required this.userUid,
     required this.userImg,
-    required this.userPassword,
+     this.userPassword,
     required this.isOnline,
+    required this.token,
   });
 
   Map<String, dynamic> toJson() => {
@@ -21,7 +23,8 @@ class UserModel {
         'uid': userUid,
         'img': userImg,
         'password': userPassword,
-        'online': isOnline
+        'online': isOnline,
+    'token':token
       };
 
   static UserModel fromJson(Map<String, dynamic> json) => UserModel(
@@ -31,5 +34,7 @@ class UserModel {
         userImg: json['img'],
         userPassword: json['password'],
         isOnline: json['online'],
+        token: json['token'],
+
       );
 }

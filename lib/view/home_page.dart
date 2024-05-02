@@ -1,13 +1,10 @@
 import 'package:chat_app_firebase/model/user_model.dart';
-import 'package:chat_app_firebase/view/login_page.dart';
-import 'package:chat_app_firebase/services/auth/auth_gate.dart';
 import 'package:chat_app_firebase/utils/const.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../model/message.dart';
 import '../services/auth/auth_service.dart';
 import '../utils/app_color.dart';
 import 'chat_page.dart';
@@ -24,12 +21,53 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final email = FirebaseAuth.instance.currentUser!.email;
   final myUid = FirebaseAuth.instance.currentUser!.uid;
   String? imgUrl;
+  String? username;
+  String? mtoken = '';
+
+
+
+
+  ///token
+  void getToken() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    NotificationSettings settings = await messaging.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true);
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('User granted permission');
+      await messaging.getToken().then((token) {
+        setState(() {
+          mtoken = token;
+          print('My token is $mtoken');
+        });
+        saveToken(token!);
+      });
+    } else {
+      print('User declined');
+      await FirebaseMessaging.instance.requestPermission();
+    }
+  }
+
+ /// Save Token
+  void saveToken(String token) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(myUid)
+        .update({'token': token});
+  }
 
   /// Sign Out
   void signOut() async {
     final authService = Provider.of<AuthService>(context, listen: false);
     try {
-     await setStatus(false);
+      await setStatus(false);
       await authService.signOut();
     } catch (e) {
       ScaffoldMessenger.of(context)
@@ -48,6 +86,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         // Access specific fields from the user document
         setState(() {
           imgUrl = userData!['img'];
+          username= userData!['name'];
         });
       } else {
         print('User document does not exist');
@@ -57,21 +96,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-
   @override
   void initState() {
-
     // TODO: implement initState
-
     super.initState();
+    print('init');
+     FirebaseMessaging.instance.requestPermission();
+    getToken();
     WidgetsBinding.instance.addObserver(this);
     setStatus(true);
     getUserDetails();
   }
 
-   setStatus(bool status) async {
+  setStatus(bool status) async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
-
     await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
@@ -160,7 +198,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         return ListView.builder(
           itemCount: snapshot.data!.docs.length,
           itemBuilder: (BuildContext context, int index) {
-
             return _buildUserListItem(snapshot.data!.docs[index]);
           },
         );
@@ -170,6 +207,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   ///_buildUserListItem
   Widget _buildUserListItem(DocumentSnapshot document) {
+
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
     if (_auth.currentUser!.email != data['email']) {
       return Padding(
@@ -183,13 +221,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ChatPage(
+                    username: username?? 'User',
                     userModel: UserModel(
                         userEmail: data['email'],
                         username: data['name'],
                         userUid: data['uid'],
                         userImg: data['img'],
                         userPassword: data['password'],
-                        isOnline: data['online']),
+                        isOnline: data['online'],
+                        token: data['token']),
                   ),
                 ));
           },
@@ -201,7 +241,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 backgroundImage: NetworkImage(data['img']),
               ),
               const SizedBox(width: 10),
-              // Column (Name + Last Message + Last Message Timetstamp)
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,16 +261,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
-
                   ],
                 ),
               ),
               // Message status
-              const Padding(
-                padding: EdgeInsets.only(left: 10, right: 10),
+               Padding(
+                padding:const EdgeInsets.only(left: 10, right: 10),
                 child: Icon(
-                  Icons.check_circle_outline,
-                  color: AppColors.messengerDarkGrey,
+                  data['online'] == true? Icons.public :  Icons.public,
+                  color: data['online'] == true?AppColors.greenColor: AppColors.messengerDarkGrey,
                 ),
               ),
             ],
@@ -243,7 +281,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  ///search
+  ///search widget
   Widget _buildChatsSearchWidget() => Container(
         decoration: BoxDecoration(
           color: AppColors.greyColor.withOpacity(.5),
